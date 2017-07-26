@@ -1,3 +1,3 @@
-# brushfire-chp6-start
+# brushfire-chp7-end
 
 a [Sails](http://sailsjs.org) application
