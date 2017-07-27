@@ -127,6 +127,38 @@ profile: function (req, res) {
     return res.json(user);
 
   });
+},
+
+delete: function(req, res){
+
+  if(!req.param('id')){
+    return res.badRequest('id is a required parameter.');
+  }
+
+  User.destroy({id: req.param('id')}).exec(function(err, usersDestroyed){
+    if(err)
+      return res.negotiate(err);
+    if(usersDestroyed.length === 0){
+      return res.notFound();
+    }
+    return res.ok();
+    });
+},
+
+removeProfile: function(req, res){
+
+  if(!req.param('id'))
+    return res.badRequest('id is a required parameter');
+
+  User.update({id: req.param('id')},{deleted: true}).exec(function(err,removedUser){
+    if(err)
+      return res.negotiate(err);
+    if(removedUser.length === 0)
+      return res.notFound();
+    return res.ok();
+  });
+
+
 }
 
 };
