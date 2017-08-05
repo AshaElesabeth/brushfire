@@ -1,4 +1,4 @@
-angular.module('brushfire', ['ngRoute', 'toastr', 'compareTo'])
+angular.module('brushfire', ['ngRoute', 'toastr', 'compareTo', 'ngPatternRestrict'])
   .config(['$sceDelegateProvider', function($sceDelegateProvider) {
     $sceDelegateProvider.resourceUrlWhitelist([
       'self',
@@ -6,18 +6,11 @@ angular.module('brushfire', ['ngRoute', 'toastr', 'compareTo'])
     ]);
   }])
 
-.filter('spaceless', function() {
-  return function(input) {
-    if (input) {
-      return input.replace(/\s+/g, '-');
-    }
-  };
-})
-
 .config(['$routeProvider', function($routeProvider) {
 
   $routeProvider
 
+  // #/    (i.e. ng-view's "home" state)
     .when('/', {
     templateUrl: '/templates/home.html'
   })
@@ -34,21 +27,29 @@ angular.module('brushfire', ['ngRoute', 'toastr', 'compareTo'])
 
   .when('/videos', {
     templateUrl: '/templates/videos.html',
+    // If the current user is an admin, "redirect" (client-side) to `#/users`.
+    // Otherwise redirect to `#/profile`
     controller: 'videosPageController'
   })
 
   .when('/profile/:id', {
     templateUrl: '/templates/profile.html',
+    // If the current user is an admin, "redirect" (client-side) to `#/users`.
+    // Otherwise redirect to `#/profile`
     controller: 'profilePageController'
   })
 
   .when('/profile/edit/:id', {
     templateUrl: '/templates/edit-profile.html',
+    // If the current user is an admin, "redirect" (client-side) to `#/users`.
+    // Otherwise redirect to `#/profile`
     controller: 'editProfilePageController'
   })
 
   .when('/restore', {
-    templateUrl: '/templates/restore-profile.html',
+    templateUrl: '/templates/restore.html',
+    // If the current user is an admin, "redirect" (client-side) to `#/users`.
+    // Otherwise redirect to `#/profile`
     controller: 'restorePageController'
   });
 }]);

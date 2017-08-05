@@ -90,6 +90,7 @@ module.exports.connections = {
     database: 'brushfire'
   }
 
+
   /***************************************************************************
   *                                                                          *
   * More adapters: https://github.com/balderdashy/sails                      *

@@ -1,3 +1,3 @@
-# brushfire-chp7-end
+# brushfire-chp8-start
 
 a [Sails](http://sailsjs.org) application

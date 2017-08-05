@@ -19,9 +19,8 @@ module.exports.bootstrap = function(cb) {
 
     // If there's at least one log the number to the console.
     if (numVideos > 0) {
-      console.log('Existing video records: ', numVideos)
-      //return cb();
-      return createTestUsers();
+      // return cb();
+      return createTestUsers();   
     }
 
     // Add machinepack-youtube as a depedency
@@ -35,6 +34,7 @@ module.exports.bootstrap = function(cb) {
     }).exec({
       // An unexpected error occurred.
       error: function(err) {
+        console.log('the error', err);
 
       },
       // OK.
@@ -51,9 +51,8 @@ module.exports.bootstrap = function(cb) {
           if (err) {
             return cb(err);
           }
-          console.log(foundVideos);
-          //return cb();
-          return createTestUsers();
+          // return cb();
+          return createTestUsers();   
         });
       },
     });
