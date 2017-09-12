@@ -11,6 +11,66 @@ var Gravatar = require('machinepack-gravatar');
 
 module.exports = {
 
+  login: function (req, res) {    
+
+    User.findOne({
+      or : [
+        { email: req.param('email') },
+        { username: req.param('username') }
+      ]
+    }, function foundUser(err, createdUser) {
+      if (err) return res.negotiate(err);
+      if (!createdUser) return res.notFound();
+
+      Passwords.checkPassword({
+        passwordAttempt: req.param('password'),
+        encryptedPassword: createdUser.encryptedPassword
+      }).exec({
+
+        error: function (err){
+          return res.negotiate(err);
+        },
+
+        incorrect: function (){
+          return res.notFound();
+        },
+
+        success: function (){
+       if (createdUser.deleted) {
+            return res.forbidden("'Your our account has been deleted. Please visit http://brushfire.io/restore to restore your account.'");
+          }
+
+       if (createdUser.banned) {
+            return res.forbidden("'Your our account has been banned, most likely for adding dog videos in violation of the Terms of Service. Please contact Chad or his mother.'");
+          }
+          
+          // Login user
+          req.session.userId = createdUser.id;
+
+          // Respond with a 200 status
+          return res.ok();
+        }
+      });
+    });
+  },
+
+  logout: function (req, res) {
+    if (!req.session.userId) return res.redirect('/');
+
+    User.findOne(req.session.userId, function foundUser(err, user) {
+      if (err) return res.negotiate(err);
+      if (!user) {
+        sails.log.verbose('Session refers to a user who no longer exists.');
+        return res.redirect('/');
+      }
+
+      // Logout user
+      req.session.userId = null;
+
+      return res.redirect('/');
+    });
+  },
+
   signup: function(req, res) {
 
     if (_.isUndefined(req.param('email'))) {
@@ -100,6 +160,9 @@ module.exports = {
                 return res.negotiate(err);
               }
 
+              // Log the user in
+              req.session.userId = createdUser.id;
+
               return res.json(createdUser);
             });
           }
@@ -141,12 +204,12 @@ module.exports = {
   },
   removeProfile: function(req, res) {
 
-    if (!req.param('id')) { 
-      return res.badRequest('id is a required parameter.');
-    }
+    //if (!req.param('id')) { 
+    //  return res.badRequest('id is a required parameter.');
+    //}
 
     User.update({ 
-      id: req.param('id')
+      id: req.session.userId
     }, {
       deleted: true 
     }, function(err, removedUser) {
@@ -156,6 +219,8 @@ module.exports = {
         return res.notFound();
       }
 
+      // Log user out
+      req.session.userId = null;
       return res.ok(); 
     });
   },
@@ -188,6 +253,9 @@ module.exports = {
             deleted: false
           }).exec(function(err, updatedUser) {
 
+            // Log the user in
+            req.session.userId = user.id;
+
             return res.json(updatedUser);
           });
         }
@@ -213,7 +281,7 @@ module.exports = {
   updateProfile: function(req, res) {
 
     User.update({
-      id: req.param('id')
+      id: req.session.userId
     }, {
       gravatarURL: req.param('gravatarURL') 
     }, function(err, updatedUser) {
@@ -244,7 +312,8 @@ module.exports = {
       success: function(result) {
 
         User.update({ 
-          id: req.param('id')
+          //id: req.param('id')
+          id: req.session.userId
         }, {
           encryptedPassword: result
         }).exec(function(err, updatedUser) {

@@ -70,8 +70,8 @@ angular.module('brushfire').controller('profilePageController', ['$location', '$
     // console.log('the change userprofile is: ', $scope.userProfile);
 
     // var theRoute = '/user/removeProfile/' + $scope.userProfile.properties.id;
-    var theRoute = '/user/removeProfile/' + $scope.me.id;
-    $http.put(theRoute, {
+    // var theRoute = '/user/removeProfile/' + $scope.me.id;
+    $$http.put('/user/removeProfile', {
         deleted: true
       })
       .then(function onSuccess(sailsResponse) {
